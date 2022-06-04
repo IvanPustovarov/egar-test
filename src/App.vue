@@ -1,60 +1,123 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
     <v-main>
-      <HelloWorld/>
+      <v-container fluid>
+        <v-row justify="center">
+          <v-col cols="2">
+            <v-btn tile color="success">
+              <v-icon dark> mdi-plus </v-icon>
+              Create
+            </v-btn>
+          </v-col>
+          <v-col cols="10">
+            <v-expansion-panels>
+              <v-expansion-panel
+                class="user-profile"
+                v-for="UserProfile in info"
+                :key="UserProfile.createdAt"
+              >
+                <user-profile :user="UserProfile"></user-profile>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-col>
+        </v-row>
+        <!-- <v-btn depressed color="primary" @click="increment"> Increment </v-btn>
+      <v-btn depressed color="primary" @click="decrement"> Decrement </v-btn>
+      <v-btn depressed color="primary" @click="asyncIncrementExample">
+        Increment later
+      </v-btn> -->
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+const axios = require("axios").default;
+//import { INCREMENT } from "./store/mutation-types";
+import UserProfile from "./components/user-profile.vue";
 
 export default {
-  name: 'App',
+  name: "App",
 
   components: {
-    HelloWorld,
+    UserProfile,
   },
 
   data: () => ({
-    //
+    info: null,
+    user: {
+      name: "",
+      surname: "",
+      patronymic: "",
+      bio: "",
+      department: "",
+    },
+    activePicker: null,
+    date: null,
+    menu: false,
+    formHasErrors: false,
+    address: null,
+    errorMessages: "",
+    rules: {
+      name: [(val) => (val || "").length > 0 || "This field is required"],
+    },
   }),
+  watch: {
+    menu(val) {
+      val && setTimeout(() => (this.activePicker = "YEAR"));
+    },
+    "user.name"() {
+      this.errorMessages = "";
+    },
+  },
+  computed: {
+    count() {
+      return this.$store.state.count;
+    },
+  },
+
+  methods: {
+    increment() {
+      this.$store.commit({
+        type: "increment",
+        amount: 10,
+      });
+    },
+    addressCheck() {
+      this.errorMessages =
+        this.address && !this.name ? `Hey! I'm required` : "";
+
+      return true;
+    },
+    save(date) {
+      this.$refs.menu.save(date);
+    },
+    submit() {},
+    asyncIncrementExample() {
+      this.$store.dispatch({
+        type: "asyncIncrementExampleStore",
+        amount: 10,
+      });
+    },
+    decrement() {
+      this.$store.dispatch({
+        type: "decrement",
+        amount: 10,
+      });
+    },
+  },
+
+  mounted() {
+    axios
+      .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee")
+      .then((response) => (this.info = response.data))
+      .catch((error) => console.log(error));
+  },
 };
 </script>
+
+<style lang="scss">
+.user-profile {
+  margin-bottom: 15px;
+}
+</style>
