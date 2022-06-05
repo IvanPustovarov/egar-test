@@ -13,7 +13,7 @@
             <v-expansion-panels>
               <v-expansion-panel
                 class="user-profile"
-                v-for="UserProfile in info"
+                v-for="UserProfile in infoComputed"
                 :key="UserProfile.createdAt"
               >
                 <user-profile :user="UserProfile"></user-profile>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-const axios = require("axios").default;
+//const axios = require("axios").default;
 //import { INCREMENT } from "./store/mutation-types";
 import UserProfile from "./components/user-profile.vue";
 
@@ -45,34 +45,16 @@ export default {
 
   data: () => ({
     info: null,
-    user: {
-      name: "",
-      surname: "",
-      patronymic: "",
-      bio: "",
-      department: "",
-    },
-    activePicker: null,
-    date: null,
-    menu: false,
-    formHasErrors: false,
-    address: null,
-    errorMessages: "",
-    rules: {
-      name: [(val) => (val || "").length > 0 || "This field is required"],
-    },
   }),
   watch: {
-    menu(val) {
-      val && setTimeout(() => (this.activePicker = "YEAR"));
-    },
-    "user.name"() {
-      this.errorMessages = "";
-    },
+    infoComputed() {},
   },
   computed: {
     count() {
       return this.$store.state.count;
+    },
+    infoComputed() {
+      return this.$store.state.employees;
     },
   },
 
@@ -83,16 +65,6 @@ export default {
         amount: 10,
       });
     },
-    addressCheck() {
-      this.errorMessages =
-        this.address && !this.name ? `Hey! I'm required` : "";
-
-      return true;
-    },
-    save(date) {
-      this.$refs.menu.save(date);
-    },
-    submit() {},
     asyncIncrementExample() {
       this.$store.dispatch({
         type: "asyncIncrementExampleStore",
@@ -108,10 +80,14 @@ export default {
   },
 
   mounted() {
-    axios
-      .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee")
-      .then((response) => (this.info = response.data))
-      .catch((error) => console.log(error));
+    // axios
+    //   .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee")
+    //   .then((response) => (this.info = response.data))
+    //   .catch((error) => console.log(error));
+
+    this.$store.dispatch({
+      type: "loadEmployees",
+    });
   },
 };
 </script>

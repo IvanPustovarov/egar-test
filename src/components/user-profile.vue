@@ -7,7 +7,7 @@
             <v-fade-transition leave-absolute>
               <span v-if="open" key="0"> Fill employee card </span>
               <span v-else key="1">
-                {{ userLocal.name }}
+                {{ user.name }}
               </span>
             </v-fade-transition>
           </v-col>
@@ -17,14 +17,25 @@
     <v-expansion-panel-content>
       <v-row justify="center">
         <v-col cols="12" sm="10" md="8" lg="6">
-          <v-btn tile color="warning">
+          <v-btn tile color="warning" @click="changeInfo">
             <v-icon left> mdi-pencil </v-icon>
             Edit
           </v-btn>
           <v-btn color="error"> Delete </v-btn>
           <v-card ref="form">
             <v-card-text>
+              <div
+                v-if="
+                  user.name &&
+                  user.surname &&
+                  user.patronymic &&
+                  !this.onInfoChange
+                "
+              >
+                {{ `${user.name} ${user.surname} ${user.patronymic}` }}
+              </div>
               <v-text-field
+                v-else
                 v-model="fullNameComputed"
                 :rules="[
                   () =>
@@ -36,7 +47,11 @@
                 required
               ></v-text-field>
 
+              <div v-if="user.address && !this.onInfoChange">
+                {{ user.address }}
+              </div>
               <v-text-field
+                v-else
                 v-model="userLocal.address"
                 :rules="[
                   () =>
@@ -54,7 +69,11 @@
                 required
               ></v-text-field>
 
+              <div v-if="user.department && !this.onInfoChange">
+                {{ user.department }}
+              </div>
               <v-text-field
+                v-else
                 v-model="userLocal.department"
                 :rules="[
                   () => !!userLocal.department || 'This field is required',
@@ -64,7 +83,10 @@
                 required
               ></v-text-field>
 
-              <div>
+              <div v-if="user.birthdate && !this.onInfoChange">
+                {{ user.birthdate }}
+              </div>
+              <div v-else>
                 <div class="mb-6">
                   Active picker:
                   <code>{{ activePicker || "Select the date" }}</code>
@@ -105,7 +127,11 @@
                 </v-menu>
               </div>
 
+              <div v-if="user.about && !this.onInfoChange">
+                {{ user.about }}
+              </div>
               <v-textarea
+                v-else
                 v-model="userLocal.about"
                 color="teal"
                 filled
@@ -154,6 +180,7 @@ export default {
       birthdate: "",
       address: null,
     },
+    onInfoChange: false,
     activePicker: null,
     menu: false,
     formHasErrors: false,
@@ -209,6 +236,9 @@ export default {
         type: "increment",
         amount: 10,
       });
+    },
+    changeInfo() {
+      this.onInfoChange = !this.onInfoChange;
     },
     saveDate(date) {
       this.$refs.menu.save(date);
