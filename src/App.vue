@@ -21,19 +21,12 @@
             </v-expansion-panels>
           </v-col>
         </v-row>
-        <!-- <v-btn depressed color="primary" @click="increment"> Increment </v-btn>
-      <v-btn depressed color="primary" @click="decrement"> Decrement </v-btn>
-      <v-btn depressed color="primary" @click="asyncIncrementExample">
-        Increment later
-      </v-btn> -->
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-//const axios = require("axios").default;
-//import { INCREMENT } from "./store/mutation-types";
 import UserProfile from "./components/user-profile.vue";
 
 export default {
@@ -43,48 +36,18 @@ export default {
     UserProfile,
   },
 
-  data: () => ({
-    info: null,
-  }),
-  watch: {
-    infoComputed() {},
-  },
+  data: () => ({}),
+  watch: {},
+
   computed: {
-    count() {
-      return this.$store.state.count;
-    },
     infoComputed() {
       return this.$store.state.employees;
     },
   },
 
-  methods: {
-    increment() {
-      this.$store.commit({
-        type: "increment",
-        amount: 10,
-      });
-    },
-    asyncIncrementExample() {
-      this.$store.dispatch({
-        type: "asyncIncrementExampleStore",
-        amount: 10,
-      });
-    },
-    decrement() {
-      this.$store.dispatch({
-        type: "decrement",
-        amount: 10,
-      });
-    },
-  },
+  methods: {},
 
   mounted() {
-    // axios
-    //   .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee")
-    //   .then((response) => (this.info = response.data))
-    //   .catch((error) => console.log(error));
-
     this.$store.dispatch({
       type: "loadEmployees",
     });

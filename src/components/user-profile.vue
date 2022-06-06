@@ -21,7 +21,9 @@
             <v-icon left> mdi-pencil </v-icon>
             Edit
           </v-btn>
-          <v-btn color="error"> Delete </v-btn>
+          <v-btn color="error" @click="deleteEmployee(userLocalComputed.id)">
+            Delete
+          </v-btn>
           <v-card ref="form">
             <v-card-text>
               <div
@@ -39,7 +41,7 @@
                 v-model="fullNameComputed"
                 :rules="[
                   () =>
-                    !!fullName ||
+                    !!fullNameComputed ||
                     'This field is required. Example: `Winston Smith Vasilyewich`',
                 ]"
                 label="Full Name"
@@ -52,15 +54,15 @@
               </div>
               <v-text-field
                 v-else
-                v-model="userLocal.address"
+                v-model="userLocalComputed.address"
                 :rules="[
                   () =>
-                    !!userLocal.address ||
+                    !!userLocalComputed.address ||
                     'This field is required. Example: `Moscow, 221b Lubyanka st.`',
                   () =>
-                    (!!userLocal.address &&
-                      userLocal.address.length > 3 &&
-                      userLocal.address.length <= 25) ||
+                    (!!userLocalComputed.address &&
+                      userLocalComputed.address.length > 3 &&
+                      userLocalComputed.address.length <= 25) ||
                     'Address must be less than 25 characters and more than 3 characters',
                 ]"
                 label="Address Line"
@@ -74,9 +76,10 @@
               </div>
               <v-text-field
                 v-else
-                v-model="userLocal.department"
+                v-model="userLocalComputed.department"
                 :rules="[
-                  () => !!userLocal.department || 'This field is required',
+                  () =>
+                    !!userLocalComputed.department || 'This field is required',
                 ]"
                 label="Department"
                 placeholder="Department of Back-End"
@@ -101,7 +104,7 @@
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <v-text-field
-                      v-model="userLocal.birthdate"
+                      v-model="userLocalComputed.birthdate"
                       label="Birthday date"
                       prepend-icon="mdi-calendar"
                       readonly
@@ -110,7 +113,7 @@
                     ></v-text-field>
                   </template>
                   <v-date-picker
-                    v-model="userLocal.birthdate"
+                    v-model="userLocalComputed.birthdate"
                     :landscape="true"
                     :active-picker.sync="activePicker"
                     :max="
@@ -132,7 +135,7 @@
               </div>
               <v-textarea
                 v-else
-                v-model="userLocal.about"
+                v-model="userLocalComputed.about"
                 color="teal"
                 filled
                 auto-grow
@@ -145,7 +148,7 @@
                 </template>
               </v-textarea>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions v-if="this.onInfoChange">
               <v-btn text> Cancel </v-btn>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="submit"> Submit </v-btn>
@@ -167,19 +170,17 @@ export default {
   },
 
   data: () => ({
-    info: null,
-    fullName: false,
-    userLocal: {
-      fullName: {
-        name: "",
-        surname: "",
-        patronymic: "",
-      },
-      about: "",
-      department: "",
-      birthdate: "",
-      address: null,
-    },
+    // userLocal: {
+    //   fullName: {
+    //     name: "",
+    //     surname: "",
+    //     patronymic: "",
+    //   },
+    //   about: "",
+    //   department: "",
+    //   birthdate: "",
+    //   address: null,
+    // },
     onInfoChange: false,
     activePicker: null,
     menu: false,
@@ -198,11 +199,25 @@ export default {
     count() {
       return this.$store.state.count;
     },
+    userLocalComputed() {
+      return {
+        fullName: {
+          name: this.user.name ? this.user.name : "",
+          surname: this.user.surname ? this.user.surname : "",
+          patronymic: this.user.patronymic ? this.user.patronymic : "",
+        },
+        about: this.user.about ? this.user.about : "",
+        department: this.user.department ? this.user.department : "",
+        birthdate: this.user.birthdate ? this.user.birthdate : "",
+        address: this.user.address ? this.user.address : "",
+        id: this.user.id ? this.user.id : "",
+      };
+    },
     fullNameComputed: {
       get() {
-        const name = this.userLocal.fullName.name;
-        const surname = this.userLocal.fullName.surname;
-        const patronymic = this.userLocal.fullName.patronymic;
+        const name = this.userLocalComputed.fullName.name;
+        const surname = this.userLocalComputed.fullName.surname;
+        const patronymic = this.userLocalComputed.fullName.patronymic;
         if (name && surname && patronymic) {
           return `${name} ${surname} ${patronymic}`;
         }
@@ -215,10 +230,10 @@ export default {
         let arrayOfFullname = [];
         newValue = newValue.trim();
         let reg = /^[A-Za-z]+\s[A-Za-z]+\s[A-Za-z]+$/gi;
-        this.fullName = reg.test(newValue);
-        if (this.fullName) {
+        this.userLocalComputed.fullName = reg.test(newValue);
+        if (this.userLocalComputed.fullName) {
           arrayOfFullname = newValue.split(" ");
-          this.userLocal.fullName = {
+          this.userLocalComputed.fullName = {
             name: arrayOfFullname[0],
             surname: arrayOfFullname[1],
             patronymic: arrayOfFullname[2],
@@ -231,10 +246,10 @@ export default {
   },
 
   methods: {
-    increment() {
-      this.$store.commit({
-        type: "increment",
-        amount: 10,
+    deleteEmployee(id) {
+      this.$store.dispatch({
+        type: "deleteEmployee",
+        id: id,
       });
     },
     changeInfo() {
@@ -242,20 +257,9 @@ export default {
     },
     saveDate(date) {
       this.$refs.menu.save(date);
+      this.userLocalComputed.birthdate = date;
     },
     submit() {},
-    asyncIncrementExample() {
-      this.$store.dispatch({
-        type: "asyncIncrementExampleStore",
-        amount: 10,
-      });
-    },
-    decrement() {
-      this.$store.dispatch({
-        type: "decrement",
-        amount: 10,
-      });
-    },
   },
 
   mounted() {},

@@ -1,9 +1,6 @@
-
 import Vue from 'vue'
 import Vuex from 'vuex'
 const axios = require("axios").default;
-
-// import { INCREMENT } from './mutation-types'
 
 Vue.use(Vuex)
 
@@ -15,32 +12,25 @@ export default new Vuex.Store({
   getters: {
   },
   mutations: {
-    increment (state, payload) {
-      state.count += payload.amount
-    },
-    decrement (state, payload) {
-      state.count -= payload.amount
-    },
     updateEmployees (state, payload) {
       state.employees = payload.data;
+    },
+    deleteEmployee(state, id) {
+      const findedElemIndex = state.employees.findIndex((elem) => elem.id === id);
+      state.employees.splice(findedElemIndex, 1);
     }
   },
   actions: {
-    // actions -- asynchronyc mutation
-    asyncIncrementExampleStore ({commit}, amount) {
-      commit('increment', amount)
-    },
-    decrement ({commit}, amount) {
-      commit('decrement', amount)
-    },
-    // updateEmployees ({commit}, employee) {
-    //   commit("updateEmployees", employee)
-    // },
     loadEmployees({commit}) {
       axios
         .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee")
         .then((response) => (commit('updateEmployees', response)))
         .catch((error) => console.log(error));
+    },
+    deleteEmployee ({commit}, id) {
+      axios
+        .delete(`https://629915c87b866a90ec368b06.mockapi.io/api/employee/${id.id}`)
+        .then((response) => (commit('deleteEmployee', response.data.id)));
     }
   },
   modules: {
