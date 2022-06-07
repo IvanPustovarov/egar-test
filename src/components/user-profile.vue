@@ -41,7 +41,7 @@
                 v-model="fullNameComputed"
                 :rules="[
                   () =>
-                    !!fullNameComputed ||
+                    !!isfullNameValid ||
                     'This field is required. Example: `Winston Smith Vasilyewich`',
                 ]"
                 label="Full Name"
@@ -148,10 +148,17 @@
                 </template>
               </v-textarea>
             </v-card-text>
+
             <v-card-actions v-if="this.onInfoChange">
               <v-btn text> Cancel </v-btn>
               <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="submit"> Submit </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="submitData(userLocalComputed)"
+              >
+                Submit
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -181,6 +188,7 @@ export default {
     //   birthdate: "",
     //   address: null,
     // },
+    isfullNameValid: false,
     onInfoChange: false,
     activePicker: null,
     menu: false,
@@ -230,8 +238,8 @@ export default {
         let arrayOfFullname = [];
         newValue = newValue.trim();
         let reg = /^[A-Za-z]+\s[A-Za-z]+\s[A-Za-z]+$/gi;
-        this.userLocalComputed.fullName = reg.test(newValue);
-        if (this.userLocalComputed.fullName) {
+        this.isfullNameValid = reg.test(newValue);
+        if (this.isfullNameValid) {
           arrayOfFullname = newValue.split(" ");
           this.userLocalComputed.fullName = {
             name: arrayOfFullname[0],
@@ -259,7 +267,12 @@ export default {
       this.$refs.menu.save(date);
       this.userLocalComputed.birthdate = date;
     },
-    submit() {},
+    submitData(employee) {
+      this.$store.dispatch({
+        type: "updateEmployee",
+        employee: employee,
+      });
+    },
   },
 
   mounted() {},
