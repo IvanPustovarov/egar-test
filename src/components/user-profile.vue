@@ -8,7 +8,7 @@
               <span v-if="open" key="0"> Fill employee card </span>
               <span v-else key="1">
                 {{
-                  `${userLocalComputed.fullName.name} ${userLocalComputed.fullName.surname} ${userLocalComputed.fullName.patronymic}`
+                  `${userLocalComputed.name} ${userLocalComputed.surname} ${userLocalComputed.patronymic}`
                 }}
               </span>
             </v-fade-transition>
@@ -19,7 +19,12 @@
     <v-expansion-panel-content>
       <v-row justify="center">
         <v-col cols="12" sm="10" md="8" lg="6">
-          <v-btn tile color="warning" @click="changeInfo">
+          <v-btn
+            tile
+            color="warning"
+            @click="changeInfo"
+            :disabled="onInfoChange"
+          >
             <v-icon left> mdi-pencil </v-icon>
             Edit
           </v-btn>
@@ -30,14 +35,14 @@
             <v-card-text>
               <div
                 v-if="
-                  userLocalComputed.fullName.name &&
-                  userLocalComputed.fullName.surname &&
-                  userLocalComputed.fullName.patronymic &&
+                  userLocalComputed.name &&
+                  userLocalComputed.surname &&
+                  userLocalComputed.patronymic &&
                   !this.onInfoChange
                 "
               >
                 {{
-                  `${userLocalComputed.fullName.name} ${userLocalComputed.fullName.surname} ${userLocalComputed.fullName.patronymic}`
+                  `${userLocalComputed.name} ${userLocalComputed.surname} ${userLocalComputed.patronymic}`
                 }}
               </div>
               <v-text-field
@@ -76,7 +81,7 @@
               ></v-text-field>
 
               <div v-if="userLocalComputed.department && !this.onInfoChange">
-                {{ user.department }}
+                {{ userLocalComputed.department }}
               </div>
               <v-text-field
                 v-else
@@ -91,7 +96,7 @@
               ></v-text-field>
 
               <div v-if="userLocalComputed.birthdate && !this.onInfoChange">
-                {{ user.birthdate }}
+                {{ userLocalComputed.birthdate }}
               </div>
               <div v-else>
                 <div class="mb-6">
@@ -135,7 +140,7 @@
               </div>
 
               <div v-if="userLocalComputed.about && !this.onInfoChange">
-                {{ user.about }}
+                {{ userLocalComputed.about }}
               </div>
               <v-textarea
                 v-else
@@ -154,7 +159,7 @@
             </v-card-text>
 
             <v-card-actions v-if="this.onInfoChange">
-              <v-btn text> Cancel </v-btn>
+              <v-btn text @click="cancelChange"> Cancel </v-btn>
               <v-spacer></v-spacer>
               <v-btn
                 color="primary"
@@ -181,7 +186,7 @@ export default {
   },
 
   data: () => ({
-    isfullNameValid: false,
+    isfullNameValid: true,
     onInfoChange: false,
     activePicker: null,
     menu: false,
@@ -202,11 +207,9 @@ export default {
     },
     userLocalComputed() {
       return {
-        fullName: {
-          name: this.user.name ? this.user.name : "",
-          surname: this.user.surname ? this.user.surname : "",
-          patronymic: this.user.patronymic ? this.user.patronymic : "",
-        },
+        name: this.user.name ? this.user.name : "",
+        surname: this.user.surname ? this.user.surname : "",
+        patronymic: this.user.patronymic ? this.user.patronymic : "",
         about: this.user.about ? this.user.about : "",
         department: this.user.department ? this.user.department : "",
         birthdate: this.user.birthdate ? this.user.birthdate : "",
@@ -216,9 +219,9 @@ export default {
     },
     fullNameComputed: {
       get() {
-        const name = this.userLocalComputed.fullName.name;
-        const surname = this.userLocalComputed.fullName.surname;
-        const patronymic = this.userLocalComputed.fullName.patronymic;
+        const name = this.userLocalComputed.name;
+        const surname = this.userLocalComputed.surname;
+        const patronymic = this.userLocalComputed.patronymic;
         if (name && surname && patronymic) {
           return `${name} ${surname} ${patronymic}`;
         }
@@ -234,11 +237,9 @@ export default {
         this.isfullNameValid = reg.test(newValue);
         if (this.isfullNameValid) {
           arrayOfFullname = newValue.split(" ");
-          this.userLocalComputed.fullName = {
-            name: arrayOfFullname[0],
-            surname: arrayOfFullname[1],
-            patronymic: arrayOfFullname[2],
-          };
+          this.userLocalComputed.name = arrayOfFullname[0];
+          this.userLocalComputed.surname = arrayOfFullname[1];
+          this.userLocalComputed.patronymic = arrayOfFullname[2];
           return true;
         }
         return false;
@@ -254,7 +255,10 @@ export default {
       });
     },
     changeInfo() {
-      this.onInfoChange = !this.onInfoChange;
+      this.onInfoChange = true;
+    },
+    cancelChange() {
+      this.onInfoChange = false;
     },
     saveDate(date) {
       this.$refs.menu.save(date);
@@ -265,6 +269,7 @@ export default {
         type: "updateEmployee",
         employee: employee,
       });
+      this.onInfoChange = false;
     },
   },
 

@@ -20,7 +20,10 @@ export default new Vuex.Store({
     },
     updateEmployee (state, employee) {
       const findedElemIndex = state.employees.findIndex((elem) => elem.id === employee.id);
+      console.log(state.employees[findedElemIndex]);
+      console.log(employee);
       state.employees[findedElemIndex] = employee;
+      console.log(state.employees[findedElemIndex]);
     }
   },
   actions: {
@@ -36,17 +39,8 @@ export default new Vuex.Store({
         .then((response) => (commit('deleteEmployee', response.data.id)));
     },
     updateEmployee (context, employee) {
-      const employeeToPut = {
-        name: employee.employee.fullName.name,
-        surname: employee.employee.fullName.surname,
-        patronymic: employee.employee.fullName.patronymic,
-        birthdate: employee.employee.birthdate,
-        address: employee.employee.address,
-        department: employee.employee.department,
-        about: employee.employee.about,
-      }
       axios
-        .put(`https://629915c87b866a90ec368b06.mockapi.io/api/employee/${employee.employee.id}`, employeeToPut)
+        .put(`https://629915c87b866a90ec368b06.mockapi.io/api/employee/${employee.employee.id}`, employee.employee)
         .then((response) => (context.commit('updateEmployee', response.data)));
     }
   },
