@@ -7,7 +7,9 @@
             <v-fade-transition leave-absolute>
               <span v-if="open" key="0"> Fill employee card </span>
               <span v-else key="1">
-                {{ user.name }}
+                {{
+                  `${userLocalComputed.fullName.name} ${userLocalComputed.fullName.surname} ${userLocalComputed.fullName.patronymic}`
+                }}
               </span>
             </v-fade-transition>
           </v-col>
@@ -28,13 +30,15 @@
             <v-card-text>
               <div
                 v-if="
-                  user.name &&
-                  user.surname &&
-                  user.patronymic &&
+                  userLocalComputed.fullName.name &&
+                  userLocalComputed.fullName.surname &&
+                  userLocalComputed.fullName.patronymic &&
                   !this.onInfoChange
                 "
               >
-                {{ `${user.name} ${user.surname} ${user.patronymic}` }}
+                {{
+                  `${userLocalComputed.fullName.name} ${userLocalComputed.fullName.surname} ${userLocalComputed.fullName.patronymic}`
+                }}
               </div>
               <v-text-field
                 v-else
@@ -49,8 +53,8 @@
                 required
               ></v-text-field>
 
-              <div v-if="user.address && !this.onInfoChange">
-                {{ user.address }}
+              <div v-if="userLocalComputed.address && !this.onInfoChange">
+                {{ userLocalComputed.address }}
               </div>
               <v-text-field
                 v-else
@@ -71,7 +75,7 @@
                 required
               ></v-text-field>
 
-              <div v-if="user.department && !this.onInfoChange">
+              <div v-if="userLocalComputed.department && !this.onInfoChange">
                 {{ user.department }}
               </div>
               <v-text-field
@@ -86,7 +90,7 @@
                 required
               ></v-text-field>
 
-              <div v-if="user.birthdate && !this.onInfoChange">
+              <div v-if="userLocalComputed.birthdate && !this.onInfoChange">
                 {{ user.birthdate }}
               </div>
               <div v-else>
@@ -130,7 +134,7 @@
                 </v-menu>
               </div>
 
-              <div v-if="user.about && !this.onInfoChange">
+              <div v-if="userLocalComputed.about && !this.onInfoChange">
                 {{ user.about }}
               </div>
               <v-textarea
@@ -177,17 +181,6 @@ export default {
   },
 
   data: () => ({
-    // userLocal: {
-    //   fullName: {
-    //     name: "",
-    //     surname: "",
-    //     patronymic: "",
-    //   },
-    //   about: "",
-    //   department: "",
-    //   birthdate: "",
-    //   address: null,
-    // },
     isfullNameValid: false,
     onInfoChange: false,
     activePicker: null,
