@@ -48,11 +48,7 @@
               <v-text-field
                 v-else
                 v-model="fullNameComputed"
-                :rules="[
-                  () =>
-                    !!isfullNameValid ||
-                    'This field is required. Example: `Winston Smith Vasilyewich`',
-                ]"
+                :rules="rules.fullname"
                 label="Full Name"
                 placeholder="John Doe Ivanovich"
                 required
@@ -169,6 +165,11 @@
                 Submit
               </v-btn>
             </v-card-actions>
+            <v-card-actions v-if="isNew">
+              <v-btn text @click="createEmployee(userLocalComputed)">
+                Create
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -186,14 +187,18 @@ export default {
   },
 
   data: () => ({
-    isfullNameValid: true,
+    isfullNameValid: false,
     onInfoChange: false,
     activePicker: null,
     menu: false,
     formHasErrors: false,
-    errorMessages: "",
     rules: {
       name: [(val) => (val || "").length > 0 || "This field is required"],
+      fullname: [
+        (val) =>
+          /^[A-Za-z]+\s[A-Za-z]+\s[A-Za-z]+$/gi.test(val) ||
+          "This field is required. Example: `Winston Smith Vasilyewich`",
+      ],
     },
   }),
   watch: {
@@ -202,19 +207,16 @@ export default {
     },
   },
   computed: {
-    count() {
-      return this.$store.state.count;
-    },
     userLocalComputed() {
       return {
-        name: this.user.name ? this.user.name : "",
-        surname: this.user.surname ? this.user.surname : "",
-        patronymic: this.user.patronymic ? this.user.patronymic : "",
-        about: this.user.about ? this.user.about : "",
-        department: this.user.department ? this.user.department : "",
-        birthdate: this.user.birthdate ? this.user.birthdate : "",
-        address: this.user.address ? this.user.address : "",
-        id: this.user.id ? this.user.id : "",
+        name: this.user.name || "",
+        surname: this.user.surname || "",
+        patronymic: this.user.patronymic || "",
+        about: this.user.about || "",
+        department: this.user.department || "",
+        birthdate: this.user.birthdate || "",
+        address: this.user.address || "",
+        id: this.user.id || "",
       };
     },
     fullNameComputed: {
@@ -245,6 +247,9 @@ export default {
         return false;
       },
     },
+    isNew() {
+      return this.$store.state.isNew.payload;
+    },
   },
 
   methods: {
@@ -260,6 +265,12 @@ export default {
     cancelChange() {
       this.onInfoChange = false;
     },
+    createEmployee(employee) {
+      this.$store.dispatch({
+        type: "createEmployee",
+        employee: employee,
+      });
+    },
     saveDate(date) {
       this.$refs.menu.save(date);
       this.userLocalComputed.birthdate = date;
@@ -269,10 +280,19 @@ export default {
         type: "updateEmployee",
         employee: employee,
       });
+
       this.onInfoChange = false;
     },
   },
 
-  mounted() {},
+  mounted() {
+    if (
+      this.userLocalComputed.name &&
+      this.userLocalComputed.surname &&
+      this.userLocalComputed.patronymic
+    ) {
+      this.isfullNameValid = true;
+    }
+  },
 };
 </script>

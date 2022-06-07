@@ -4,7 +4,12 @@
       <v-container fluid>
         <v-row justify="center">
           <v-col cols="2">
-            <v-btn tile color="success">
+            <v-btn
+              tile
+              color="success"
+              @click="createEmployee"
+              :disabled="isNew"
+            >
               <v-icon dark> mdi-plus </v-icon>
               Create
             </v-btn>
@@ -43,9 +48,25 @@ export default {
     infoComputed() {
       return this.$store.state.employees;
     },
+    isNew() {
+      return this.$store.state.isNew.payload;
+    },
   },
 
-  methods: {},
+  methods: {
+    createEmployee() {
+      // TODO: isNew flag to submit button.
+      this.$store.commit({
+        type: "isCreatingEmployee",
+        payload: true,
+      });
+
+      this.$store.commit({
+        type: "createEmployee",
+        user: {},
+      });
+    },
+  },
 
   mounted() {
     this.$store.dispatch({
