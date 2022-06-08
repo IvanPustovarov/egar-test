@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 const axios = require("axios").default;
+const URL = "https://629915c87b866a90ec368b06.mockapi.io/api/employee";
 
 Vue.use(Vuex)
 
@@ -33,25 +34,24 @@ export default new Vuex.Store({
   actions: {
     loadEmployees({commit}) {
       axios
-        .get("https://629915c87b866a90ec368b06.mockapi.io/api/employee") // TODO: extract to const
-        .then((response) => (commit('loadEmployees', response.data)))
-        .catch((error) => console.log(error));
+        .get(`${URL}`)
+        .then((response) => (commit('loadEmployees', response.data)));
     },
     deleteEmployee ({commit}, id) {
       axios
-        .delete(`https://629915c87b866a90ec368b06.mockapi.io/api/employee/${id.id}`)
+        .delete(`${URL}/${id.id}`)
         .then((response) => (commit('deleteEmployee', response.data.id)));
     },
     updateEmployee ({commit}, employee) {
       axios
-        .put(`https://629915c87b866a90ec368b06.mockapi.io/api/employee/${employee.employee.id}`, employee.employee)
+        .put(`${URL}/${employee.employee.id}`, employee.employee)
         .then((response) => (commit('updateEmployee', response.data)));
     },
-    createEmployee ({commit}, employee) {
+    createEmployee (context, employee) {
       axios
-        .post(`https://629915c87b866a90ec368b06.mockapi.io/api/employee`, employee.employee)
-        .then((response) => (commit('createEmployee', response.data)));
-        commit('isCreatingEmployee', false);
+      .post(`${URL}`, employee.employee)
+      .then(()=> (context.dispatch('loadEmployees')))
+      .then(()=> (context.commit('isCreatingEmployee', false)))
     }
   },
   modules: {
