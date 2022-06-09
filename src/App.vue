@@ -70,7 +70,7 @@ export default {
   },
 
   data: () => ({
-    //It's just simple CRUD application and it doesn't need
+    //It's just simple CRUD application and it's not needed
   }),
   watch: {},
 
