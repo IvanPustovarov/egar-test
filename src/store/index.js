@@ -16,6 +16,9 @@ export default new Vuex.Store({
     isCreatingEmployee (state, payload) {
       state.isNew = payload;
     },
+    cancelCreateEmployee (state) {
+      state.employees.pop();
+    },
     loadEmployees (state, payload) {
       state.employees = payload;
     },

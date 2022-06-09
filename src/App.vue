@@ -55,7 +55,6 @@ export default {
 
   methods: {
     createEmployee() {
-      // TODO: isNew flag to submit button.
       this.$store.commit({
         type: "isCreatingEmployee",
         payload: true,
