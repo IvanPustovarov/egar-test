@@ -69,7 +69,9 @@ export default {
     userProfile,
   },
 
-  data: () => ({}),
+  data: () => ({
+    //It's just simple CRUD application and it doesn't need
+  }),
   watch: {},
 
   computed: {
