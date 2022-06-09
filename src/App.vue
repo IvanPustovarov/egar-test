@@ -18,8 +18,8 @@
             <v-expansion-panels>
               <v-expansion-panel
                 class="user-profile"
-                v-for="UserProfile in infoComputed"
-                :key="UserProfile.createdAt"
+                v-for="userProfile in employees"
+                :key="userProfile.createdAt"
               >
                 <v-expansion-panel-header>
                   <template v-slot:default="{ open }">
@@ -32,13 +32,13 @@
                           <span v-else key="1">
                             <div
                               v-if="
-                                UserProfile.name &&
-                                UserProfile.surname &&
-                                UserProfile.patronymic
+                                userProfile.name &&
+                                userProfile.surname &&
+                                userProfile.patronymic
                               "
                             >
                               {{
-                                `${UserProfile.name} ${UserProfile.surname} ${UserProfile.patronymic}`
+                                `${userProfile.name} ${userProfile.surname} ${userProfile.patronymic}`
                               }}
                             </div>
                           </span>
@@ -48,7 +48,7 @@
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <user-profile :user="UserProfile"></user-profile>
+                  <user-profile :user="userProfile"></user-profile>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -60,20 +60,20 @@
 </template>
 
 <script>
-import UserProfile from "./components/user-profile.vue";
+import userProfile from "./components/user-profile.vue";
 
 export default {
   name: "App",
 
   components: {
-    UserProfile,
+    userProfile,
   },
 
   data: () => ({}),
   watch: {},
 
   computed: {
-    infoComputed() {
+    employees() {
       return this.$store.state.employees;
     },
     isNew() {

@@ -19,13 +19,12 @@
                 userLocalComputed.name &&
                 userLocalComputed.surname &&
                 userLocalComputed.patronymic &&
-                !this.onInfoChange &&
-                userLocalComputed.id
+                readCard
               "
             >
               <h2>
                 {{
-                  `Full name of employee: ${userLocalComputed.name} ${userLocalComputed.surname} ${userLocalComputed.patronymic}`
+                  `${userLocalComputed.name} ${userLocalComputed.surname} ${userLocalComputed.patronymic}`
                 }}
               </h2>
             </div>
@@ -38,14 +37,8 @@
               required
             ></v-text-field>
 
-            <div
-              v-if="
-                userLocalComputed.address &&
-                !this.onInfoChange &&
-                userLocalComputed.id
-              "
-            >
-              <h3>Employee address: {{ userLocalComputed.address }}</h3>
+            <div v-if="userLocalComputed.address && readCard">
+              <h3>{{ userLocalComputed.address }}</h3>
             </div>
             <v-text-field
               v-else
@@ -56,45 +49,28 @@
                   'This field is required. Example: `Moscow, 221b Lubyanka st.`',
                 () =>
                   (!!userLocalComputed.address &&
-                    userLocalComputed.address.length > 3 &&
-                    userLocalComputed.address.length <= 25) ||
-                  'Address must be less than 25 characters and more than 3 characters',
+                    userLocalComputed.address.length > 3) ||
+                  'Address must be more than 3 characters',
               ]"
               label="Address Line"
               placeholder="Snowy Rock Pl"
-              counter="25"
               required
             ></v-text-field>
 
-            <div
-              v-if="
-                userLocalComputed.department &&
-                !this.onInfoChange &&
-                userLocalComputed.id
-              "
-            >
-              <h3>Employee department: {{ userLocalComputed.department }}</h3>
+            <div v-if="userLocalComputed.department && readCard">
+              <h3>{{ userLocalComputed.department }}</h3>
             </div>
             <v-text-field
               v-else
               v-model="userLocalComputed.department"
-              :rules="[
-                () =>
-                  !!userLocalComputed.department || 'This field is required',
-              ]"
+              :rules="rules.name"
               label="Department"
               placeholder="Department of Back-End"
               required
             ></v-text-field>
 
-            <div
-              v-if="
-                userLocalComputed.birthdate &&
-                !this.onInfoChange &&
-                userLocalComputed.id
-              "
-            >
-              <h3>Employee birthdate: {{ userLocalComputed.birthdate }}</h3>
+            <div v-if="userLocalComputed.birthdate && readCard">
+              <h3>{{ userLocalComputed.birthdate }}</h3>
             </div>
             <div v-else>
               <div class="mb-6">
@@ -137,14 +113,8 @@
               </v-menu>
             </div>
 
-            <div
-              v-if="
-                userLocalComputed.about &&
-                !this.onInfoChange &&
-                userLocalComputed.id
-              "
-            >
-              <p>About employee: {{ userLocalComputed.about }}</p>
+            <div v-if="userLocalComputed.about && readCard">
+              <p>{{ userLocalComputed.about }}</p>
             </div>
             <v-textarea
               v-else
@@ -161,7 +131,13 @@
             </v-textarea>
           </v-card-text>
           <v-card-actions v-if="this.onInfoChange">
-            <v-btn color="normal" @click="cancelChange"> Cancel </v-btn>
+            <v-btn
+              color="normal"
+              @click="cancelChange"
+              :disabled="!isFormValid"
+            >
+              Cancel
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn
               color="primary"
@@ -199,11 +175,9 @@ export default {
 
   data: () => ({
     isFormValid: true,
-    isfullNameValid: false,
     onInfoChange: false,
     activePicker: null,
     menu: false,
-    formHasErrors: false,
     rules: {
       name: [(val) => (val || "").length > 0 || "This field is required"],
       fullname: [
@@ -231,32 +205,23 @@ export default {
         id: this.user.id || "",
       };
     },
+    readCard() {
+      return !this.onInfoChange && this.userLocalComputed.id;
+    },
     fullNameComputed: {
       get() {
         const name = this.userLocalComputed.name;
         const surname = this.userLocalComputed.surname;
         const patronymic = this.userLocalComputed.patronymic;
-        if (name && surname && patronymic) {
-          return `${name} ${surname} ${patronymic}`;
-        }
-        if (!name || !surname || !patronymic) {
-          return "";
-        }
-        return false;
+        return `${name} ${surname} ${patronymic}`;
       },
       set(newValue) {
         let arrayOfFullname = [];
         newValue = newValue.trim();
-        let reg = /^[A-Za-z]+\s[A-Za-z]+\s[A-Za-z]+$/gi;
-        this.isfullNameValid = reg.test(newValue);
-        if (this.isfullNameValid) {
-          arrayOfFullname = newValue.split(" ");
-          this.userLocalComputed.name = arrayOfFullname[0];
-          this.userLocalComputed.surname = arrayOfFullname[1];
-          this.userLocalComputed.patronymic = arrayOfFullname[2];
-          return true;
-        }
-        return false;
+        arrayOfFullname = newValue.split(" ");
+        this.userLocalComputed.name = arrayOfFullname[0];
+        this.userLocalComputed.surname = arrayOfFullname[1];
+        this.userLocalComputed.patronymic = arrayOfFullname[2];
       },
     },
     isNew() {
@@ -307,20 +272,9 @@ export default {
     },
   },
 
-  mounted() {
-    if (
-      this.userLocalComputed.name &&
-      this.userLocalComputed.surname &&
-      this.userLocalComputed.patronymic
-    ) {
-      this.isfullNameValid = true;
-    }
-  },
+  mounted() {},
 };
 </script>
 
 <style lang="scss">
-.panel {
-  // width: 100rem;
-}
 </style>
